@@ -10,9 +10,9 @@ import WatchedSummary from "./components/WatchedSummary";
 import Loader from "./components/Loader";
 import ErrorMessage from "./components/ErrorMessage";
 
-const apiUrl = import.meta.env.VITE_API_URL;
 
 const App = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false)
