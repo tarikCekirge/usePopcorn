@@ -4,7 +4,7 @@ import Main from "./components/Main";
 import Search from "./components/Search";
 import NumResults from "./components/NumResults";
 import ListBox from './components/ListBox';
-import WatchedBox from './components/WatchedMovieList'
+import WachedMovieList from './components/WatchedMovieList'
 import MovieList from "./components/MovieList";
 import WatchedSummary from "./components/WatchedSummary";
 import Loader from "./components/Loader";
@@ -47,6 +47,19 @@ const App = () => {
 
   }
 
+  const handleAddWatched = (movie) => {
+    setWatched((watched) => {
+      const alreadyExists = watched.some(item => item.imdbID === movie.imdbID);
+      if (alreadyExists) return watched;
+      return [movie, ...watched];
+    });
+  };
+
+  const handleDeleteWatched = (id) => {
+    setWatched(watched => watched.filter(movie => movie.imdbID !== id))
+    setSelectedId(null)
+  }
+
   useEffect(() => {
     (async () => {
       if (!query.length) {
@@ -78,10 +91,10 @@ const App = () => {
           {!isLoading && error && <ErrorMessage message={error} />}
         </ListBox>
         <ListBox>
-          {selectedId ? <MovieDetail selectedId={selectedId} handleCloseMovie={handleCloseMovie} /> : (
+          {selectedId ? <MovieDetail watched={watched} onAddWatched={handleAddWatched} selectedId={selectedId} handleCloseMovie={handleCloseMovie} /> : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedBox watched={watched} />
+              <WachedMovieList watched={watched} onDelete={handleDeleteWatched} />
             </>
           )}
         </ListBox>

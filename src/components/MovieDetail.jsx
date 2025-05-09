@@ -15,10 +15,13 @@ const fetchMovieDetail = async (id) => {
     }
 };
 
-const MovieDetail = ({ selectedId, handleCloseMovie }) => {
+const MovieDetail = ({ watched, selectedId, handleCloseMovie, onAddWatched }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [movie, setMovie] = useState({});
+    const [userRating, setUserRating] = useState()
+    const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId)
+    const watchedUserRating = watched.find(movie => movie.imdbID)?.userRating
     const {
         Title,
         Year,
@@ -54,6 +57,7 @@ const MovieDetail = ({ selectedId, handleCloseMovie }) => {
                 const data = await fetchMovieDetail(selectedId);
                 setMovie(data);
                 setError(null);
+                setUserRating(data.imdbRating)
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -62,6 +66,20 @@ const MovieDetail = ({ selectedId, handleCloseMovie }) => {
         })();
     }, [selectedId]);
 
+
+    const handleAdd = (movie) => {
+        const newMovie = {
+            imdbRating,
+            imdbID,
+            title: Title,
+            yer: Year,
+            runtime: Number(Runtime.split(' ').at(0)) || 0,
+            poster: Poster,
+            userRating: Number(userRating)
+        }
+        onAddWatched(newMovie)
+        handleCloseMovie()
+    }
     return (
         <div className="details">
             <button className="btn-back" onClick={handleCloseMovie}>
@@ -96,13 +114,22 @@ const MovieDetail = ({ selectedId, handleCloseMovie }) => {
                             </div>
                         </header>
                         <section>
-                            <div className="rating">
-                                <StarRating
-                                    size={24}
-                                    maxRating={10}
-                                    defaultRating={parseFloat(imdbRating) || 0}
-                                />
-                            </div>
+                            {isWatched ?
+                                <>
+                                    <div className="rating"><p>You rated this movie: 🌟{watchedUserRating}</p></div>
+                                </> :
+                                <>
+                                    <div className="rating">
+                                        <StarRating
+                                            onSetRating={setUserRating}
+                                            size={24}
+                                            maxRating={10}
+                                            defaultRating={parseFloat(imdbRating) || 0}
+                                        />
+                                    </div>
+                                    <button className="btn-add" onClick={() => handleAdd(movie)}>+ Add Watched</button>
+                                </>
+                            }
                             <p>
 
                                 <em> {Plot}</em>
