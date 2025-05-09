@@ -17,7 +17,7 @@ const App = () => {
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [query, setQuery] = useState("inception");
+  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null)
 
   const fetchMovies = async (searchTerm, controller) => {
@@ -65,6 +65,8 @@ const App = () => {
     setSelectedId(null)
   }
 
+
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -74,7 +76,7 @@ const App = () => {
         setError('');
         return;
       }
-
+      handleCloseMovie()
       const data = await fetchMovies(query, controller);
       if (data) {
         setMovies(data.Search);
