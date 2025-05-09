@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import StarRating from "./StarRating";
 import Loader from "./Loader";
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -65,6 +65,13 @@ const MovieDetail = ({ watched, selectedId, handleCloseMovie, onAddWatched }) =>
             }
         })();
     }, [selectedId]);
+
+    useEffect(() => {
+        if (!Title) return
+        document.title = `Movie | ${Title}`;
+        return () => document.title = 'usePopcorn'
+
+    }, [Title]);
 
 
     const handleAdd = (movie) => {
