@@ -20,23 +20,28 @@ const App = () => {
   const [query, setQuery] = useState("inception");
   const [selectedId, setSelectedId] = useState(null)
 
-  const fetchMovies = async (searchTerm) => {
+  const fetchMovies = async (searchTerm, controller) => {
     try {
       setIsLoading(true);
       setError("");
-      const response = await fetch(`${apiUrl}&s=${searchTerm}`);
+      const response = await fetch(`${apiUrl}&s=${searchTerm}`, {
+        signal: controller.signal,
+      });
       if (!response.ok) throw new Error("Network Error");
       const data = await response.json();
       if (data.Response === "False") throw new Error("Movie not found!");
       return data;
     } catch (error) {
-      console.error(error);
-      setError(error.message);
+      if (error.name !== "AbortError") {
+        console.error(error);
+        setError(error.message);
+      }
       return null;
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const handleSelectMovie = (movieId) => {
     setSelectedId(selectedId => (movieId === selectedId ? null : movieId))
@@ -61,6 +66,8 @@ const App = () => {
   }
 
   useEffect(() => {
+    const controller = new AbortController();
+
     (async () => {
       if (!query.length) {
         setMovies([]);
@@ -68,14 +75,18 @@ const App = () => {
         return;
       }
 
-      const data = await fetchMovies(query);
+      const data = await fetchMovies(query, controller);
       if (data) {
         setMovies(data.Search);
       } else {
         setMovies([]);
       }
     })();
+
+    return () => controller.abort();
   }, [query]);
+
+
 
 
   return (
