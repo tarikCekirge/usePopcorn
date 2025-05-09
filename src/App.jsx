@@ -9,6 +9,7 @@ import MovieList from "./components/MovieList";
 import WatchedSummary from "./components/WatchedSummary";
 import Loader from "./components/Loader";
 import ErrorMessage from "./components/ErrorMessage";
+import MovieDetail from "./components/MovieDetail";
 
 const App = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -16,7 +17,8 @@ const App = () => {
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [query, setQuery] = useState("interstellar");
+  const [query, setQuery] = useState("inception");
+  const [selectedId, setSelectedId] = useState(null)
 
   const fetchMovies = async (searchTerm) => {
     try {
@@ -35,6 +37,15 @@ const App = () => {
       setIsLoading(false);
     }
   };
+
+  const handleSelectMovie = (movieId) => {
+    setSelectedId(selectedId => (movieId === selectedId ? null : movieId))
+  }
+
+  const handleCloseMovie = () => {
+    setSelectedId(null)
+
+  }
 
   useEffect(() => {
     const getData = async () => {
@@ -57,18 +68,22 @@ const App = () => {
   return (
     <>
       <Navbar>
-        <Search setQuery={setQuery} />
+        <Search query={query} setQuery={setQuery} />
         <NumResults movies={movies} />
       </Navbar>
       <Main>
         <ListBox>
           {isLoading && !error && <Loader />}
-          {!isLoading && !error && <MovieList movies={movies} />}
+          {!isLoading && !error && <MovieList movies={movies} onSelectedMovie={handleSelectMovie} />}
           {!isLoading && error && <ErrorMessage message={error} />}
         </ListBox>
         <ListBox>
-          <WatchedSummary watched={watched} />
-          <WatchedBox watched={watched} />
+          {selectedId ? <MovieDetail selectedId={selectedId} handleCloseMovie={handleCloseMovie} /> : (
+            <>
+              <WatchedSummary watched={watched} />
+              <WatchedBox watched={watched} />
+            </>
+          )}
         </ListBox>
       </Main>
     </>

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
-const Search = ({ setQuery }) => {
-    const [input, setInput] = useState('interstellar');
+const Search = ({ query, setQuery }) => {
+    const [input, setInput] = useState(query);
     const [debouncedInput] = useDebounce(input, 500);
 
     useEffect(() => {
