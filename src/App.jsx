@@ -10,49 +10,54 @@ import WatchedSummary from "./components/WatchedSummary";
 import Loader from "./components/Loader";
 import ErrorMessage from "./components/ErrorMessage";
 
-
 const App = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [query, setQuery] = useState("interstellar");
 
-  const fetchMovies = async () => {
+  const fetchMovies = async (searchTerm) => {
     try {
-      setIsLoading(true)
-      const response = await fetch(`${apiUrl}&s=${query}`);
+      setIsLoading(true);
+      setError("");
+      const response = await fetch(`${apiUrl}&s=${searchTerm}`);
       if (!response.ok) throw new Error("Network Error");
       const data = await response.json();
       if (data.Response === "False") throw new Error("Movie not found!");
-      console.log(data)
-      setIsLoading(false)
       return data;
     } catch (error) {
       console.error(error);
-      setError(error.message)
+      setError(error.message);
       return null;
     } finally {
-      setIsLoading(false)
-
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     const getData = async () => {
-      const data = await fetchMovies();
+      const data = await fetchMovies(query);
       if (data) {
         setMovies(data.Search);
+      } else {
+        setMovies([]);
       }
     };
+
+    if (!query.length) {
+      setMovies([])
+      setError('')
+      return
+    }
     getData();
   }, [query]);
 
   return (
     <>
       <Navbar>
-        <Search query={query} setQuery={setQuery} />
+        <Search setQuery={setQuery} />
         <NumResults movies={movies} />
       </Navbar>
       <Main>
