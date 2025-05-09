@@ -48,22 +48,22 @@ const App = () => {
   }
 
   useEffect(() => {
-    const getData = async () => {
+    (async () => {
+      if (!query.length) {
+        setMovies([]);
+        setError('');
+        return;
+      }
+
       const data = await fetchMovies(query);
       if (data) {
         setMovies(data.Search);
       } else {
         setMovies([]);
       }
-    };
-
-    if (!query.length) {
-      setMovies([])
-      setError('')
-      return
-    }
-    getData();
+    })();
   }, [query]);
+
 
   return (
     <>
