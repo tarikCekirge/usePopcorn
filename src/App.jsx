@@ -10,12 +10,9 @@ import WatchedSummary from "./components/WatchedSummary";
 import Loader from "./components/Loader";
 import ErrorMessage from "./components/ErrorMessage";
 import MovieDetail from "./components/MovieDetail";
+import { useMovies } from "./hooks/useMovies";
 
 const App = () => {
-  const apiUrl = import.meta.env.VITE_API_URL;
-  const [movies, setMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null)
   // const [watched, setWatched] = useState([]);
@@ -24,34 +21,16 @@ const App = () => {
     return storedValue ? JSON.parse(storedValue) : [];
   });
 
-  const fetchMovies = async (searchTerm, controller) => {
-    try {
-      setIsLoading(true);
-      setError("");
-      const response = await fetch(`${apiUrl}&s=${searchTerm}`, {
-        signal: controller.signal,
-      });
-      if (!response.ok) throw new Error("Network Error");
-      const data = await response.json();
-      if (data.Response === "False") throw new Error("Movie not found!");
-      return data;
-    } catch (error) {
-      if (error.name !== "AbortError") {
-        console.error(error);
-        setError(error.message);
-      }
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { movies, isLoading, error } = useMovies(query, handleCloseMovie)
+
+
 
 
   const handleSelectMovie = (movieId) => {
     setSelectedId(selectedId => (movieId === selectedId ? null : movieId))
   }
 
-  const handleCloseMovie = () => {
+  function handleCloseMovie() {
     setSelectedId(null)
 
   }
@@ -75,26 +54,7 @@ const App = () => {
     , [watched])
 
 
-  useEffect(() => {
-    const controller = new AbortController();
 
-    (async () => {
-      if (!query.length) {
-        setMovies([]);
-        setError('');
-        return;
-      }
-      handleCloseMovie()
-      const data = await fetchMovies(query, controller);
-      if (data) {
-        setMovies(data.Search);
-      } else {
-        setMovies([]);
-      }
-    })();
-
-    return () => controller.abort();
-  }, [query]);
 
 
 
