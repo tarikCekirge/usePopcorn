@@ -14,15 +14,11 @@ import MovieDetail from "./components/MovieDetail";
 const App = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const [movies, setMovies] = useState([]);
+  const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null)
-  // const [watched, setWatched] = useState([]);
-  const [watched, setWatched] = useState(() => {
-    const storedValue = localStorage.getItem('watched');
-    return storedValue ? JSON.parse(storedValue) : [];
-  });
 
   const fetchMovies = async (searchTerm, controller) => {
     try {
@@ -69,10 +65,6 @@ const App = () => {
     setSelectedId(null)
   }
 
-  useEffect(() => {
-    localStorage.setItem('watched', JSON.stringify(watched))
-  }
-    , [watched])
 
 
   useEffect(() => {
